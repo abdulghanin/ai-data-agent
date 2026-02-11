@@ -91,11 +91,18 @@ def get_schema():
 
     conn = get_conn()
 
-    with conn.cursor() as cur:
-        cur.execute(f"DESCRIBE {TABLE_NAME}")
-        rows = cur.fetchall()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(f"DESCRIBE {TABLE_NAME}")
+            rows = cur.fetchall()
+    except Exception as e:
+        conn.close()
+        raise HTTPException(400, f"Table not found or schema error: {str(e)}")
 
     conn.close()
+
+    if not rows:
+        raise HTTPException(400, "Table has no columns")
 
     return "\n".join(
         [f"- {r['Field']} ({r['Type']})" for r in rows]
@@ -141,7 +148,10 @@ SQL:
     if "response" not in data:
         raise Exception("LLM Error")
 
-    return data["response"].strip()
+    sql = data["response"].strip()
+    sql = re.sub(r"^```sql\n?|\n?```$", "", sql)
+    sql = sql.strip()
+    return sql
 
 
 # ==============================
