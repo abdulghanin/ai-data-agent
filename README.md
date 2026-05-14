@@ -201,7 +201,7 @@ Response:
 ## 👤 Author
 
 **Abdulghani Ibrahim**
-Software Engineer | MERN & Backend Developer
+AI Engineer | MERN & Backend Developer
 
 ---
 
